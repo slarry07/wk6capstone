@@ -1,16 +1,24 @@
 import { MongoClient } from "mongodb";
+import dotenv from "dotenv";
 
-const connectionString = process.env.ATLAS_URI || "";
+dotenv.config(); // load .env
 
+const connectionString = process.env.ATLAS_URI;
 const client = new MongoClient(connectionString);
 
-let conn;
-try {
-  conn = await client.connect();
-} catch(e) {
-  console.error(e);
+let db;
+
+export async function connectDB() {
+  try {
+    await client.connect();
+    db = client.db("sample_training"); // change db name if needed
+    console.log("✅ MongoDB connected");
+    return db;
+  } catch (e) {
+    console.error("❌ MongoDB connection failed:", e);
+    throw e;
+  }
 }
 
-let db = conn.db("sample_training");
+export { db };
 
-export default db;
